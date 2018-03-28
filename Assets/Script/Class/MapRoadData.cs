@@ -2,31 +2,47 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-[SerializeField]
-public class MapRoadData{
-    RoadDataFraction[] allMapRoad;
 
-    
-}
+/*
+ * 유닛이 가지는/맵 전체의 부분적인 맵데이터 정보
+ */
 
 public class RoadDataFraction
 {
     private Vector2 start; //직선거리 시작점
     private Vector2 end; //직선거리 도착점
     private Vector2[] roadData; //시작->도착까지의 타일위치(1칸 단위)
-    private int lastDataPos;
-    private int roadDir; //도로의 방향(1 좌->우,2 하->상,-1 우->좌,-2 상->하) 커지는 방향이면 양수, 작아지는 방향이면 음수
-    private Vector2 dir; //도로방향 글로 표현한 것
+    private int lastDataPos; //데이터 생성시 길 추가해야되는 위치 알기위해 사용
+
+    //길의 방향에 대한 변수들(크기가 2인 배열->전위부분 방향, 후위부분 방향)
+    public int[] roadDir; //도로의 방향(1 좌->우,2 하->상,-1 우->좌,-2 상->하) 커지는 방향이면 양수, 작아지는 방향이면 음수
+    private Vector2 nowDir; //현재 도로방향 글로 표현한 것
+
+    private Vector2[] variationPoint; //한 길조각이 이어지는 동안 방향이 바뀌는 위치, 다른 길조각과 합성시 사이에 (0,0)을 넣는다.
+    private Vector2[] connectPoint; //다른 길조각과 연결된 경우 연결된 위치, 분해시 사용하기 위해서
 
     public RoadDataFraction(){
         roadData = new Vector2[2];
+        variationPoint = new Vector2[3];
+        connectPoint = new Vector2[3]; //부족할 경우 더 늘릴것
+        roadDir = new int[2];
+        nowDir = new Vector2();
     }
 
     public RoadDataFraction(int len)
     { //혹시 맵길이를 최소길이로 줄수도 있지 않을까해서
         roadData = new Vector2[len];
+        variationPoint = new Vector2[3];
+        connectPoint = new Vector2[3]; //부족할 경우 더 늘릴것
+        roadDir = new int[2];
+        nowDir = new Vector2();
         lastDataPos = 0;
     } 
+
+    public Vector2 GetStart()
+    {
+        return start;
+    }
     /*
      * 함수 목적 : 이 데이터의 시작점/끝점이 roadData의 정보와 같은가, 시작점/끝점이 맵의 경계를 넘어서지 않는가 검사.
      *             안되어있으면 여기서 업데이트
@@ -77,10 +93,12 @@ public class RoadDataFraction
      */
     public bool AddData(Vector2 data)
     {
+        //여기 변경해야 됨(변곡점에 대한 체크가 없음)
         bool canInsert=CheckDirection(data); //길 파편이 가는 방향과 일치하는지 체크
 
         if (canInsert)
         {
+
             if (roadData[roadData.Length - 1] != null)
             { //길데이터가 가득 찬 상황이면 배열길이를 1.5배(소수점 올림)로 증가
                 Vector2[] temp = new Vector2[(int)Mathf.Ceil(roadData.Length * 1.5f)];
@@ -89,26 +107,25 @@ public class RoadDataFraction
             }
 
             roadData[lastDataPos++] = data;
+
+            //변곡에 대한 정보(변곡점 추가, roadDir[1]의 변경)
+            if (start == null)
+            { //시작점이 없는경우(맨 처음) 추가
+                start = data;
+            }
+            end = data; //마지막 위치가 바뀌었으므로 변경
+
+            SetNowDirectory(data);
+
             return true;
         }
         return false;
 
     }
 
-    private void SetDirectory()
+    private void SetNowDirectory(Vector2 vec) //현재 추가중인 길의 경로방향을 나타냄(맨 마지막에는 roadDir[1]과 같아야 정상임)
     {
-        if (Mathf.Abs(roadDir) == 1)
-        {
-            dir = new Vector2(1, 0);
-        }
-        else
-        {
-            dir = new Vector2(0, 1);
-        }
-        if (roadDir<0)
-        {
-            dir*=-1;
-        }
+        //맨 처음에는 start만 있어서 방향이 없으므로 pass시킬것
     }
 
     public bool CheckDirection(Vector2 data)
@@ -118,21 +135,20 @@ public class RoadDataFraction
             return true; 
         }
 
-        if (dir == null)
-        {
-            SetDirectory();
-        }
+        if (nowDir == null)
+        { //없다는건 start점 바로 다음 점이니 전/후위 전부 같은 방향으로 설정
+            //어떻게 수정하지?
+            Vector2 temp = data - start;
+            if(temp==new Vector2(-1, 0))
+            {//시작점에서 좌측이동은 있을 수 없음
+                return false;
+            }
 
-        Vector2 dataDir = data - end;
-
-        if (dataDir != dir)
-        {//방향이 같아야 추가진행가능
-            return false;
+            //roadDir 0,1 설정하기
+            //여기부터
         }
-        else
-        {
+        
             return true;
-        }
     }
 
     /*
@@ -145,8 +161,8 @@ public class RoadDataFraction
         {
             return false;
         }
-        if (roadDir + other.roadDir == 0)
-        { //방향이 상반된 길끼리 붙으려고 하는경우(애초에 안되긴 하는데 혹시몰라서 추가)
+        if (roadDir[1] + other.roadDir[0] == 0)
+        { //방향이 상반된 길끼리 붙으려고 하는경우(현재 길 조각의 후위방향, 후위 길조각의 전위방향)
             return false;
         }
         if (end != other.start)
@@ -154,5 +170,28 @@ public class RoadDataFraction
             return false;
         }
         return true;
+    }
+
+}
+
+public class UnitRoadData : RoadDataFraction
+{
+
+
+    /*
+     * 다른 길데이터 조각과 합쳐서 하나의 길로 만드는 함수
+     * RoadDataFraction말고 유닛의 RoadDataFraction과 합성 시도할 수도 있으니 제외시킬 방법 생각해야됨
+     * roadDir->이어붙일 길의 진행방향(찾기)
+     */
+    public UnitRoadData ConnectWithRoad(int roadDir)
+    {
+        if (CanConnectToOtherRoad(other)) //결합이 가능한가?(전/후위의 길조각들이 이어지는 위치가 맞는가)
+        {
+            //변곡점 사이에 (0,0) 넣고 합성
+        }
+        else
+        {
+            return null;
+        }
     }
 }
