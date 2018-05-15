@@ -135,6 +135,7 @@ public class Tower : MonoBehaviour
     /// <param name="param">Parameter.</param>
     private void UserClick(GameObject obj, string param)
     {
+        Debug.Log("dd "+gameObject.name);
         if (obj == gameObject) // This tower is clicked
         {
             // Show range
