@@ -327,6 +327,7 @@
     <Compile Include="Assets\CreativeSpore\SuperTilemapEditor\Scripts\Utils\TilemapVertexPaintUtils.cs" />
     <Compile Include="Assets\Script\ButtonHandler.cs" />
     <Compile Include="Assets\Script\CameraControl.cs" />
+    <Compile Include="Assets\Script\Class\AttUnit.cs" />
     <Compile Include="Assets\Script\Class\DefUnit.cs" />
     <Compile Include="Assets\Script\Class\MapJSON.cs" />
     <Compile Include="Assets\Script\Class\MapRoadData.cs" />
@@ -407,9 +408,14 @@
     <Compile Include="Assets\Script\Scripts\Inspectors\TowerActionsInspector.cs" />
     <Compile Include="Assets\Script\Scripts\Inspectors\TowersFolderInspector.cs" />
     <Compile Include="Assets\Script\Scripts\Inspectors\WavesInfoInspector.cs" />
+    <Compile Include="Assets\Script\Scripts\UnitInstallBtn.cs" />
     <Compile Include="Assets\Script\StageManager.cs" />
     <Compile Include="Assets\Script\UIManager.cs" />
     <Compile Include="Assets\Script\UiManager1.cs" />
+    <Compile Include="Assets\Script\UnitInfoUI.cs" />
+    <Compile Include="Assets\Script\UnitInstallUI.cs" />
+    <Compile Include="Assets\Script\UnitManager.cs" />
+    <Compile Include="Assets\Script\UnitSelectBtn.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\CreativeSpore\SuperTilemapEditor\Extra\Importers\Pyxel Edit\Documentation\PyxelEditManual.txt" />
@@ -419,8 +425,11 @@
     <None Include="Assets\JsonDotNet\Assemblies\Standalone\Newtonsoft.Json.XML" />
     <None Include="Assets\JsonDotNet\Assemblies\Windows\Newtonsoft.Json.XML" />
     <None Include="Assets\JsonDotNet\link.xml" />
+    <None Include="Assets\SaveFolder\AIData_Att.txt" />
+    <None Include="Assets\SaveFolder\AIData_Def.txt" />
     <None Include="Assets\SaveFolder\mapRoadData.txt" />
-    <None Include="Assets\SaveFolder\mapdata.txt" />
+    <None Include="Assets\SaveFolder\mapdata_old.txt" />
+    <None Include="Assets\SaveFolder\roadData.txt" />
     <None Include="Assets\TD2D\Prefabs\Units\Towers\Towers\MyTowers\MyTowers.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

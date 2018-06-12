@@ -1,4 +1,7 @@
 sceneSetups:
-- path: Assets/TD2D/Scenes/Levels/Level1.unity
+- path: Assets/Scene/Stage_Def.unity
   isLoaded: 1
   isActive: 1
+- path: Assets/Scene/StageUI.unity
+  isLoaded: 1
+  isActive: 0

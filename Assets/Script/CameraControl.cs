@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 
 /// <summary>
 /// Camera moving and autoscaling.
@@ -43,6 +44,7 @@ public class CameraControl : MonoBehaviour
 	private float originAspect;
 
     public GameObject mapImage;
+    public GameObject unitCreateUI; //유닛 생성을 위한 버튼(생성/취소) 에디터에서 추가하기
 
     public Transform[] boundaries;
     private float cameraWidth; //카메라 너비와 높이(맵 밖으로 나가지 않게 하기 위해서이므로 절반만)
@@ -51,26 +53,14 @@ public class CameraControl : MonoBehaviour
     /// <summary>
     /// Start this instance.
     /// </summary>
-    void Start()
+    void Awake()
 	{
-		cam = GetComponent<Camera>();
-		Debug.Assert (cam&&mapImage, "Wrong initial settings");
-
-        LoadMapImage(1); //LevelManager 코드 만들고 바꿔야됨
+        Debug.Assert (cam&&mapImage, "Wrong initial settings");
+        
         SetBoundaries(); //로드된 이미지에 맞게 카메라 이동범위 설정
         clickingTime = 0;
 
-		originAspect = cam.aspect;
-		// Get restrictive points from focus object's corners
-		maxX = focusObjectRenderer.bounds.max.x;
-		minX = focusObjectRenderer.bounds.min.x;
-		maxY = focusObjectRenderer.bounds.max.y;
-		minY = focusObjectRenderer.bounds.min.y;
-		UpdateCameraSize();
-
-        Debug.Log("우좌제약구간 : " + (boundaries[2].position.x + cameraWidth) + " " + (boundaries[0].position.x - cameraWidth));
-        Debug.Log("하상제약구간 : " + (boundaries[3].position.y + cameraHeight) + " " + (boundaries[1].position.y - cameraHeight));
-        Debug.Log("카메라 크기 : " + cameraWidth + ", " + cameraHeight);
+		originAspect = cam.aspect;        
     }
 
     /// <summary>
@@ -81,7 +71,6 @@ public class CameraControl : MonoBehaviour
         // Camera aspect ratio is changed
         if (originAspect != cam.aspect)
         {
-            UpdateCameraSize();
             originAspect = cam.aspect;
         }
         if (Input.GetMouseButton(0))
@@ -117,10 +106,44 @@ public class CameraControl : MonoBehaviour
         }
         if (Input.GetMouseButtonUp(0))
         {
+            if (clickingTime < moveCT)
+            {//일반적인 클릭일 경우
+                Vector3 movMouse = gameObject.GetComponent<Camera>().ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, 0));
+                Vector3 position = new Vector3(Mathf.Floor(movMouse.x) + 0.5f, Mathf.Floor(movMouse.y)+0.5f, -10f);
+
+                if (EventSystem.current.IsPointerOverGameObject() == false)
+                {  //UI이 위가 아니면(이건 수비유닛용이니까 공격유닛용 설치는 다른식으로 만들어야됨)
+                    bool canBuildDefUnit = GameObject.Find("MapRoadManager").GetComponent<MapRoadManager>().CheckRoadData(movMouse); //클릭한 곳이 설치가 가능한 곳인지 검사
+                    if (canBuildDefUnit)
+                    {//지을 수 있다면
+                        //유닛매니저에 위치저장
+                        GameObject.Find("UnitManager").GetComponent<UnitManager>().SetPosition(movMouse);
+                        if (unitCreateUI.activeSelf == false)
+                        { //유닛 설치 관련 UI가 꺼진 상태여야함.
+                          //설치 관련 UI(유닛 위치 미리 보여주기, 설치 및 취소버튼 생성)
+                            OpenCreateUnitUI(movMouse);
+                        }
+                        else
+                        {//켜진상태였다면 꺼버려
+                            CloseCreateUnitUI();
+                        }
+                    }
+                }
+            }
             isCameraMove = false;
             clickingTime = 0;
             moveX = moveY = originX = originY = 0;
         }
+    }
+
+    public void SetFocusObject()
+    {
+        // Get restrictive points from focus object's corners
+        maxX = focusObjectRenderer.bounds.max.x;
+        minX = focusObjectRenderer.bounds.min.x;
+        maxY = focusObjectRenderer.bounds.max.y;
+        minY = focusObjectRenderer.bounds.min.y;
+        UpdateCameraSize();
     }
     
 
@@ -129,10 +152,14 @@ public class CameraControl : MonoBehaviour
 	/// </summary>
 	private void UpdateCameraSize()
 	{
+        if (cam == null)
+        { //cam이 사용되는 시기가 CameraControl.cs가 Awake되기 전인듯해서 Awake에 쓰면 오류뜬다
+            cam = gameObject.GetComponent<Camera>();
+        }
 		switch (controlType)
 		{
 		case ControlType.ConstantWidth:
-			cam.orthographicSize = (maxX - minX - 2 * offsetX) / (2f * cam.aspect);
+                cam.orthographicSize = (maxX - minX - 2 * offsetX) / (2f * cam.aspect);
 			break;
 		case ControlType.ConstantHeight:
 			cam.orthographicSize = (maxY - minY - 2 * offsetY) / 2f;
@@ -142,13 +169,14 @@ public class CameraControl : MonoBehaviour
         cameraWidth = cameraHeight * Camera.main.aspect;
     }
 
-    private void LoadMapImage(int lev)
+    public void LoadMapImage(int lev)
     {
         Sprite image = Resources.Load<Sprite>("Level" + lev);
         if (image)
         {
             mapImage.GetComponent<SpriteRenderer>().sprite = image;
             focusObjectRenderer = mapImage.GetComponent<SpriteRenderer>();
+            SetFocusObject(); //focusObject가 카메라 Awake보다 늦게 불러져서 Awake에 사용불가하다. 따라서 호출순서를 맵을 불러오고나서로 변경
         }
         else {
             Debug.Log("이미지 없음");
@@ -182,5 +210,32 @@ public class CameraControl : MonoBehaviour
         {
             return true;
         }
+    }
+
+    public void OpenCreateUnitUI(Vector2 mousePos)
+    {
+        if (unitCreateUI.activeSelf == false)
+        {
+            unitCreateUI.SetActive(true);
+        }
+    }
+    public void CloseCreateUnitUI()
+    {
+        if (unitCreateUI.activeSelf == true)
+        {
+            //unitCreateUI의 초기화
+            unitCreateUI.SetActive(false);
+        }
+    }
+    public void RegisterInstallUI(GameObject insUI)
+    { //다른신이어서 에디터상으로 등록이 안됨
+        unitCreateUI = insUI;
+    }
+    public Vector2 GetWorldPosition(Vector2 pos)
+    {
+        Vector2 temp = cam.WorldToScreenPoint(pos);
+        temp.x -= cam.pixelWidth/2; //그냥 WorldToScreenPoint()를 사용하면 좌하단 좌표가 0,0인데, 이게임은 정가운데 좌표가 0,0이므로 화면의 반만큼을 좌표에서 빼주어야한다.
+        temp.y -= cam.pixelHeight/2;
+        return temp;
     }
 }
