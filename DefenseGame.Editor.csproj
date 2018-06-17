@@ -349,9 +349,10 @@
     <None Include="Assets\JsonDotNet\link.xml" />
     <None Include="Assets\SaveFolder\AIData_Att.txt" />
     <None Include="Assets\SaveFolder\AIData_Def.txt" />
+    <None Include="Assets\SaveFolder\RoadData.txt" />
     <None Include="Assets\SaveFolder\mapRoadData.txt" />
+    <None Include="Assets\SaveFolder\mapdata.txt" />
     <None Include="Assets\SaveFolder\mapdata_old.txt" />
-    <None Include="Assets\SaveFolder\roadData.txt" />
     <None Include="Assets\TD2D\Prefabs\Units\Towers\Towers\MyTowers\MyTowers.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

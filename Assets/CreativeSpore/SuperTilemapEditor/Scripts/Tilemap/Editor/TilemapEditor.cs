@@ -1295,7 +1295,7 @@ namespace CreativeSpore.SuperTilemapEditor
             int height = m_tilemap.MaxGridY - m_tilemap.MinGridY + 1;
             int[] mapDataId = new int[width * height]; //JSONUtility가 1차원 배열밖에 지원을 하지 않기때문에 부득이하게 1차원 배열로 진행'
 
-            string[] prevMapData = File.ReadAllText("Assets/SaveFolder/mapdata.txt").Split('\n');
+            string[] prevMapData = File.ReadAllText("Assets/SaveFolder/mapdata_old.txt").Split('\n');
 
             Debug.Log(prevMapData.Length);
             int prevLen = prevMapData.Length;
@@ -1360,7 +1360,7 @@ namespace CreativeSpore.SuperTilemapEditor
                 }
             }
 
-            File.WriteAllText("Assets/SaveFolder/mapdata.txt", json); //중복시 덮어쓰기가 됨.
+            File.WriteAllText("Assets/SaveFolder/mapdata_old.txt", json); //중복시 덮어쓰기가 됨.
             //Debug.Log(m_tilemap.MinGridX); tilemap 크기찾을때
             //Debug.Log(brush.BrushTilemap); setdata가 안되어있어서 브러시로 칠한 타일번호를 얻어온다.
         }
@@ -1372,7 +1372,7 @@ namespace CreativeSpore.SuperTilemapEditor
             int height = m_tilemap.MaxGridY - m_tilemap.MinGridY + 1;
             int[] mapDataId = new int[width * height]; //JSONUtility가 1차원 배열밖에 지원을 하지 않기때문에 부득이하게 1차원 배열로 진행'
 
-            string[] prevMapData = File.ReadAllText("Assets/SaveFolder/mapdata.txt").Split('\n');
+            string[] prevMapData = File.ReadAllText("Assets/SaveFolder/mapdata_old.txt").Split('\n');
             int prevLen = prevMapData.Length;
             MapJSON[] prevJson = new MapJSON[prevLen];
 

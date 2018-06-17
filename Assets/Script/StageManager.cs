@@ -47,6 +47,8 @@ public class StageManager : MonoBehaviour {
     {
         isDefendMode = true; //이건 나중에 attackMode추가하면 scene로딩할때 가져와야됨
 
+        GameObject.Find("MapRoadManager").GetComponent<MapRoadManager>().LoadMapRoadData(1); //lev으로 변경해야됨
+
         //UI는 따로 불러오기(LoadScene하고 속성은 additive로)
         //ui는 기본 ui, pause ui, 승패ui 총 4개
         

@@ -49,6 +49,11 @@ public class CameraControl : MonoBehaviour
     public Transform[] boundaries;
     private float cameraWidth; //카메라 너비와 높이(맵 밖으로 나가지 않게 하기 위해서이므로 절반만)
     private float cameraHeight;
+    private float mapWidth; //실제 맵의 크기
+    private float mapHeight;
+
+    private float tileWidth=1.3f;
+    private float tileHeight=1.29f;
 
     /// <summary>
     /// Start this instance.
@@ -109,15 +114,21 @@ public class CameraControl : MonoBehaviour
             if (clickingTime < moveCT)
             {//일반적인 클릭일 경우
                 Vector3 movMouse = gameObject.GetComponent<Camera>().ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, 0));
-                Vector3 position = new Vector3(Mathf.Floor(movMouse.x) + 0.5f, Mathf.Floor(movMouse.y)+0.5f, -10f);
+                Vector3 position = new Vector3(Mathf.Floor(movMouse.x) + tileWidth/2, Mathf.Floor(movMouse.y)+tileHeight/2, -10f);
 
                 if (EventSystem.current.IsPointerOverGameObject() == false)
                 {  //UI이 위가 아니면(이건 수비유닛용이니까 공격유닛용 설치는 다른식으로 만들어야됨)
-                    bool canBuildDefUnit = GameObject.Find("MapRoadManager").GetComponent<MapRoadManager>().CheckRoadData(movMouse); //클릭한 곳이 설치가 가능한 곳인지 검사
+                    //int posForTileX = (int)Mathf.Floor(Mathf.Floor(position.x)+mapWidth); //카메라너비에서 맵너비로 바꿈(카메라가 맵 전체를 보지 않아서 스크린좌표로 바꾸면 카메라 너머에 맵이 더 있는데 카메라 좌하단이 0,0이 되버린다.)
+                    //int posForTileY = (int)Mathf.Floor(Mathf.Floor(position.y)+mapHeight);
+
+                    Debug.Log(Mathf.Floor(movMouse.x)+" "+ tileWidth / 2+" "+position);
+
+                    Vector2 tilePos = new Vector2(Mathf.Floor((position.x- tileWidth / 2) /tileWidth),Mathf.Floor((position.y- tileHeight / 2) /tileHeight)); //mousePos는 타일의 중앙을 가리키도록 0.5씩 더했기 때문에 내림을 하고 중앙이 (0,0)이기 때문에 카메라 사이즈 만큼 더해주어야한다.
+                    bool canBuildDefUnit = GameObject.Find("MapRoadManager").GetComponent<MapRoadManager>().CheckRoadData(tilePos); //클릭한 곳이 설치가 가능한 곳인지 검사
                     if (canBuildDefUnit)
                     {//지을 수 있다면
                         //유닛매니저에 위치저장
-                        GameObject.Find("UnitManager").GetComponent<UnitManager>().SetPosition(movMouse);
+                        GameObject.Find("UnitManager").GetComponent<UnitManager>().SetPosition(position);
                         if (unitCreateUI.activeSelf == false)
                         { //유닛 설치 관련 UI가 꺼진 상태여야함.
                           //설치 관련 UI(유닛 위치 미리 보여주기, 설치 및 취소버튼 생성)
@@ -159,10 +170,10 @@ public class CameraControl : MonoBehaviour
 		switch (controlType)
 		{
 		case ControlType.ConstantWidth:
-                cam.orthographicSize = (maxX - minX - 2 * offsetX) / (2f * cam.aspect);
+                cam.orthographicSize = (maxX - minX - 2 * offsetX) / (2.5f*cam.aspect);
 			break;
 		case ControlType.ConstantHeight:
-			cam.orthographicSize = (maxY - minY - 2 * offsetY) / 2f;
+			cam.orthographicSize = (maxY - minY - 2 * offsetY)/2.5f;
 			break;
 		}
         cameraHeight= Camera.main.orthographicSize;
@@ -177,6 +188,8 @@ public class CameraControl : MonoBehaviour
             mapImage.GetComponent<SpriteRenderer>().sprite = image;
             focusObjectRenderer = mapImage.GetComponent<SpriteRenderer>();
             SetFocusObject(); //focusObject가 카메라 Awake보다 늦게 불러져서 Awake에 사용불가하다. 따라서 호출순서를 맵을 불러오고나서로 변경
+            mapWidth = (mapImage.GetComponent<SpriteRenderer>().size.x/2)/tileWidth; //1.3, 1.29인 이유는 MapEditor신에서 만들때 각 타일 크기를 이렇게 맞춰놔서 실제 타일수보다 사이즈가 크게나온다.
+            mapHeight = mapImage.GetComponent<SpriteRenderer>().size.y/2/tileHeight;
         }
         else {
             Debug.Log("이미지 없음");

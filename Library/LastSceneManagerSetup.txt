@@ -1,7 +1,4 @@
 sceneSetups:
-- path: Assets/Scene/Stage_Def.unity
+- path: Assets/Scene/MapEditor.unity
   isLoaded: 1
   isActive: 1
-- path: Assets/Scene/StageUI.unity
-  isLoaded: 1
-  isActive: 0
