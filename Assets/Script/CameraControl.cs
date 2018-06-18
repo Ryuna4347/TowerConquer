@@ -34,6 +34,7 @@ public class CameraControl : MonoBehaviour
 	private float maxX, minX, maxY, minY;
 	// Camera dragging at now vector
     private float moveX, moveY;
+    private float camMovSpeed=0.3f; //카메라를 움직이는 속도
     private float originX, originY;
     private float moveCT=1.0f; //required clicking time to move camera
     private float clickingTime;
@@ -52,8 +53,8 @@ public class CameraControl : MonoBehaviour
     private float mapWidth; //실제 맵의 크기
     private float mapHeight;
 
-    private float tileWidth=1.3f;
-    private float tileHeight=1.29f;
+    private float tileWidth=1f;
+    private float tileHeight=1f;
 
     /// <summary>
     /// Start this instance.
@@ -96,10 +97,14 @@ public class CameraControl : MonoBehaviour
                 Vector3 movMouse = gameObject.GetComponent<Camera>().ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, 0));
                 moveX = movMouse.x - originX;
                 moveY = movMouse.y - originY;
-                bool check=CheckBoundaries(moveX, moveY);
+
+                Vector2 movNormalize = new Vector2(moveX, moveY).normalized;
+                
+
+                bool check=CheckBoundaries(movNormalize);
                 if (check)
                 { //맵 밖으로는 이동이 불가
-                    gameObject.transform.Translate(moveX, moveY, 0);
+                    gameObject.transform.Translate(movNormalize.x*camMovSpeed, movNormalize.y * camMovSpeed, 0); //드래그 방향으로 일정속도만큼 움직임
                     originX = movMouse.x;
                     originY = movMouse.y;
                 }
@@ -121,8 +126,6 @@ public class CameraControl : MonoBehaviour
                     //int posForTileX = (int)Mathf.Floor(Mathf.Floor(position.x)+mapWidth); //카메라너비에서 맵너비로 바꿈(카메라가 맵 전체를 보지 않아서 스크린좌표로 바꾸면 카메라 너머에 맵이 더 있는데 카메라 좌하단이 0,0이 되버린다.)
                     //int posForTileY = (int)Mathf.Floor(Mathf.Floor(position.y)+mapHeight);
 
-                    Debug.Log(Mathf.Floor(movMouse.x)+" "+ tileWidth / 2+" "+position);
-
                     Vector2 tilePos = new Vector2(Mathf.Floor((position.x- tileWidth / 2) /tileWidth),Mathf.Floor((position.y- tileHeight / 2) /tileHeight)); //mousePos는 타일의 중앙을 가리키도록 0.5씩 더했기 때문에 내림을 하고 중앙이 (0,0)이기 때문에 카메라 사이즈 만큼 더해주어야한다.
                     bool canBuildDefUnit = GameObject.Find("MapRoadManager").GetComponent<MapRoadManager>().CheckRoadData(tilePos); //클릭한 곳이 설치가 가능한 곳인지 검사
                     if (canBuildDefUnit)
@@ -138,6 +141,10 @@ public class CameraControl : MonoBehaviour
                         {//켜진상태였다면 꺼버려
                             CloseCreateUnitUI();
                         }
+                    }
+                    else if(unitCreateUI.activeSelf == true)
+                    { //길을 누른 상태인데 설치관련 UI가 켜져있는 상태일 경우 UI를 안보이게
+                        CloseCreateUnitUI();
                     }
                 }
             }
@@ -189,7 +196,7 @@ public class CameraControl : MonoBehaviour
             focusObjectRenderer = mapImage.GetComponent<SpriteRenderer>();
             SetFocusObject(); //focusObject가 카메라 Awake보다 늦게 불러져서 Awake에 사용불가하다. 따라서 호출순서를 맵을 불러오고나서로 변경
             mapWidth = (mapImage.GetComponent<SpriteRenderer>().size.x/2)/tileWidth; //1.3, 1.29인 이유는 MapEditor신에서 만들때 각 타일 크기를 이렇게 맞춰놔서 실제 타일수보다 사이즈가 크게나온다.
-            mapHeight = mapImage.GetComponent<SpriteRenderer>().size.y/2/tileHeight;
+            mapHeight = (mapImage.GetComponent<SpriteRenderer>().size.y/2)/tileHeight;
         }
         else {
             Debug.Log("이미지 없음");
@@ -208,10 +215,11 @@ public class CameraControl : MonoBehaviour
         }
     }
     
-    private bool CheckBoundaries(float moveX, float moveY)
+    private bool CheckBoundaries(Vector2 movNormalized)
     {
-        float movePosX = gameObject.transform.position.x+moveX; //카메라를 옮길 x,y위치
-        float movePosY = gameObject.transform.position.y+moveY;
+
+        float movePosX = gameObject.transform.position.x+movNormalized.x*camMovSpeed; //카메라를 옮길 x,y위치
+        float movePosY = gameObject.transform.position.y+movNormalized.y*camMovSpeed;
         
 
         if ((movePosX < boundaries[2].position.x+cameraWidth || movePosX > boundaries[0].position.x - cameraWidth) ||

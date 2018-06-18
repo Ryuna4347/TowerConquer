@@ -50,6 +50,7 @@ public class MapRoadManager : MonoBehaviour
      */
     public bool CheckRoadData(Vector2 mousePos)
     {
+        Debug.Log(mousePos);
         foreach (RoadDataFraction road in allMapRoad)
         {
             string temp = "";
@@ -57,7 +58,6 @@ public class MapRoadManager : MonoBehaviour
             {
                 temp += t+" ";
             }
-            Debug.Log(mousePos);
             if (road.roadData.Contains(mousePos))
             {//만약 해당 위치를 가지는 길조각이 있다면 그곳은 길이기 때문에 설치를 받아들일 수 없다.
                 return false;

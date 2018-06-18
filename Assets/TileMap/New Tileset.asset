@@ -12,11 +12,11 @@ MonoBehaviour:
   m_Name: New Tileset
   m_EditorClassIdentifier: 
   AtlasTexture: {fileID: 2800000, guid: 1edd234bbd3c05148be20b7f299b8b5a, type: 3}
-  TilePxSize: {x: 130, y: 129}
+  TilePxSize: {x: 100, y: 100}
   SliceOffset: {x: 0, y: 0}
   SlicePadding: {x: 0, y: 0}
   BackgroundColor: {r: 0.8039216, g: 0.8039216, b: 0.8039216, a: 0.8039216}
-  VisualTileSize: {x: 32.5, y: 32.25}
+  VisualTileSize: {x: 25, y: 25}
   VisualTilePadding: 1
   TileRowLength: 7
   m_tileViews: []
