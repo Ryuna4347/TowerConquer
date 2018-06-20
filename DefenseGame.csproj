@@ -332,6 +332,7 @@
     <Compile Include="Assets\Script\Class\MapJSON.cs" />
     <Compile Include="Assets\Script\Class\MapRoadData.cs" />
     <Compile Include="Assets\Script\Class\MapRoadManager.cs" />
+    <Compile Include="Assets\Script\Class\UnitBase.cs" />
     <Compile Include="Assets\Script\EventManager.cs" />
     <Compile Include="Assets\Script\LevelChoose.cs" />
     <Compile Include="Assets\Script\LevelMenu.cs" />

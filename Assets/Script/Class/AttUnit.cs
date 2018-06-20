@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class AttUnit : MonoBehaviour {
+public class AttUnit : UnitBase {
 
     private UnitRoadData unitPath;
     public MapRoadManager mapRoadManager;

@@ -252,19 +252,21 @@ public class UnitManager : MonoBehaviour {
 
         foreach (string unitName in unitNameList)
         {
-            GameObject unit=new GameObject();
+            GameObject unit=null;
             if (unitName.Contains("Att"))
             {//공수별로 따로 유닛보관 
                 unit=Instantiate(Resources.Load<GameObject>("Unit/" + unitName), attUnitParent.transform);
             }
             else if(unitName.Contains("Def"))
             {
-                unit=Instantiate(Resources.Load<GameObject>("Unit/" + unitName), defUnitParent.transform);
+                unit =Instantiate(Resources.Load<GameObject>("Unit/" + unitName), defUnitParent.transform);
             }
             else
             {
                 Debug.Log("Loading Problem");
+                continue;
             }
+            Debug.Log(unit.name);
             unit.transform.localPosition = new Vector2(-1000, -1000);
             unit.name = unitName + "_" + unusedDefUnitList.Count;
             unusedDefUnitList.Add(unit);
