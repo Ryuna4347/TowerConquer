@@ -22,6 +22,7 @@ public class XmlAttUnit
     public string[] unitName;
     public int numOfUnit;
     public string[] unitRoadName; //유닛이 지날 길의 이름들, "없음"으로 끊고 다음 유닛 길정보로 넘어감
+    public string[] unitStartPoint; //유닛이 시작하는 곳의 위치(숫자로 구성되어있으며, 각 숫자는 길이 시작되는 곳들을 모은 리스트(MapRoadManager에 생성)에서의 번호를 나타낸다.)
     public int[] unitWaveInfo;
 }
 public class WaveInfo
