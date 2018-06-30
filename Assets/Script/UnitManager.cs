@@ -235,7 +235,7 @@ public class UnitManager : MonoBehaviour {
                                 count++;
                             }
                             count++; //지금 위치가 "없음"위치일것이기 때문에 1 더 늘려야 다음 유닛때 길 추가가 가능하다.
-
+                            
                             tempAttUnit.GetComponent<AttUnit>().SetPath(tempUnitPath);
                             tempWaveInfo.unitList.Add(tempAttUnit); //유닛과 유닛의 좌표를 리스트에 추가
                         }
@@ -301,4 +301,5 @@ public class UnitManager : MonoBehaviour {
     {
         return cameraControl.GetWorldPosition(selectMousePos);
     }
+
 }

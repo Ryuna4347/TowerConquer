@@ -12,6 +12,8 @@ public class XmlMapRoad
     public int lev;
     public int numOfRoad;
     public int[] roadDataInt;
+    public string[] start; //시작지점의 길이름
+    public string[] end; //종료지점의 길이름
 }
 /*
  *게임내에서 길에 관련된 데이터를 총괄
@@ -19,6 +21,8 @@ public class XmlMapRoad
 public class MapRoadManager : MonoBehaviour
 {
     public List<RoadDataFraction> allMapRoad;
+    private List<string> startPoint;
+    private List<string> endPoint;
 
     private void Awake()
     {
@@ -107,12 +111,34 @@ public class MapRoadManager : MonoBehaviour
                         tempRoadData.Add(roadFracPos);
                         roadIndex += 2; //roadIndex를 한번에 2개씩(x,y 하나씩)사용하므로 2씩 증가해야한다.
                     }
+
+                    foreach(string startVal in tempMapRoad.start)
+                    {
+                        startPoint.Add(startVal);
+                    }
+                    foreach (string endVal in tempMapRoad.end)
+                    {
+                        endPoint.Add(endVal);
+                    }
+
                     roadDataFrac.roadData = tempRoadData;
                     roadDataFrac.start = roadDataFrac.roadData[0]; //길조각 시작점과 종착점 선언
                     roadDataFrac.end = roadDataFrac.roadData[roadDataFrac.roadData.Count-1]; //-1은 0부터 시작하기때문
                     allMapRoad.Add(roadDataFrac);
                 }
             }
+        }
+    }
+
+    public bool CheckStartEndRoad(UnitRoadData unitRoad)
+    {
+        if (startPoint.Contains(unitRoad.roadDataNameLIst[0]) && endPoint.Contains(unitRoad.roadDataNameLIst[unitRoad.roadDataNameLIst.Count-1]))
+        { //유닛의 첫번째와 마지막 길조각은 시작/끝 길조각이어야 한다.
+            return true;
+        }
+        else
+        {
+            return false;
         }
     }
 }

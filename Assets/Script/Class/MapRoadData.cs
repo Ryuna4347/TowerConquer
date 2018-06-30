@@ -34,16 +34,20 @@ public class RoadDataFraction
 
 public class UnitRoadData : MonoBehaviour
 {
+    public List<string> roadDataNameLIst;
     public List<Vector2> unitRoadData;
     protected List<string> connectPoint; //다른 길조각과 연결된 경우 연결된 길조각들의 이름. 분해시 해당 이름의 길조각으로 분리
 
     public UnitRoadData()
     {
+        roadDataNameLIst = new List<string>();
         unitRoadData = new List<Vector2>();
         connectPoint = new List<string>();
     }
     public UnitRoadData(RoadDataFraction road)
     {
+        roadDataNameLIst = new List<string>();
+        roadDataNameLIst.Add(road.name);
         unitRoadData = road.GetRoadData();
         connectPoint = new List<string>();
     }
@@ -128,6 +132,7 @@ public class UnitRoadData : MonoBehaviour
             unitRoadData.AddRange(searchResult.GetRoadData());
             //여기서 아마 겹쳐지는 점이 2개가 생겨버리게 되버릴것. 수정필요
 
+            roadDataNameLIst.Add(roadName);
             connectPoint.Add(roadName); //결합점 정보 추가
             return true;
         }
@@ -155,9 +160,11 @@ public class UnitRoadData : MonoBehaviour
             if (roadInfo.start == pos)
             { //찾았으면 0~그 위치까지의 경로와 접합점의 리스트를 따로 빼낸다.
                 int connectionIndex = connectPoint.IndexOf(road);
+                int roadDataNameLIstIndex = roadDataNameLIst.IndexOf(road);
                 int roadIndex = unitRoadData.IndexOf(pos);
 
-                unitRoadData = unitRoadData.GetRange(0, roadIndex + 1);//+1인 이유 : pos까지 포함해야 하기때문에
+                unitRoadData = unitRoadData.GetRange(0, roadIndex + 1);//+1인 이유 : pos까지 포함해야 하기때문에 
+                roadDataNameLIst = roadDataNameLIst.GetRange(0, roadDataNameLIstIndex+1);
                 connectPoint = connectPoint.GetRange(0, connectionIndex+1);
             }
         }

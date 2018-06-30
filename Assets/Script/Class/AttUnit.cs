@@ -9,8 +9,14 @@ public class AttUnit : UnitBase {
     public GameObject rangeImg; //하위에 있는 공격범위 오브젝트
 
     private UnitRoadData unitPath;
+    private UnitManager unitManager;
     public MapRoadManager mapRoadManager;
     private Vector2 nextPathPoint; //유닛이 이동할 다음 점
+
+    private void Awake()
+    {
+        unitManager=GameObject.Find("UnitManager").GetComponent<UnitManager>();
+    }
 
     public void SetUnitPath(RoadDataFraction road)
     {
@@ -27,7 +33,7 @@ public class AttUnit : UnitBase {
     public void Move()
     {
         //웨이브가 시작되어야 함
-        bool HasStartEndRoad = unitManager.CheckStartEndRoad(unitPath);
+        bool HasStartEndRoad = MapRoadManager.CheckStartEndRoad(unitPath);
         if (HasStartEndRoad)
         {
             //nextPathPoint로 접근
