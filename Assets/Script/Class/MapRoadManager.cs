@@ -29,6 +29,15 @@ public class MapRoadManager : MonoBehaviour
         allMapRoad = new List<RoadDataFraction>();
     }
 
+    public List<string> getStartPoint()
+    {
+        return startPoint;
+    }
+    public List<string> getEndPoint()
+    {
+        return endPoint;
+    }
+
     private RoadDataFraction[] IncreaseArrSize()
     { //배열 오버플로우시
         RoadDataFraction[] temp = new RoadDataFraction[allMapRoad.Count * 2];
