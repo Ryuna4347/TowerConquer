@@ -11,7 +11,7 @@ public class AttUnit : UnitBase {
     private bool isMoving;
     public float movSpeed;
     public float attSpeed;
-
+    
     private UnitRoadData unitPath;
     private UnitManager unitManager;
     public MapRoadManager mapRoadManager;
@@ -24,6 +24,7 @@ public class AttUnit : UnitBase {
         hasStartEndRoad = isMoving = false;
         nextPathPoint = new Vector2(-1,-1);
     }
+
     public void StartUnit()
     {
         if (!isMoving)
@@ -56,6 +57,11 @@ public class AttUnit : UnitBase {
             gameObject.transform.Translate(normalizedVector * movSpeed * Time.deltaTime);
         }
         
+    }
+
+    public void UnitDead()
+    {
+        EventManager.TriggerEvent("UnitDead", gameObject,""); //UnitManager에 유닛의 죽음을 알림
     }
 
     public void SetUnitPath(RoadDataFraction road)
