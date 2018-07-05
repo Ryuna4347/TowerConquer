@@ -425,6 +425,7 @@
     <Compile Include="Assets\Script\Scripts\Inspectors\TowersFolderInspector.cs" />
     <Compile Include="Assets\Script\Scripts\Inspectors\WavesInfoInspector.cs" />
     <Compile Include="Assets\Script\Scripts\UnitInstallBtn.cs" />
+    <Compile Include="Assets\Script\SearchRange.cs" />
     <Compile Include="Assets\Script\StageManager.cs" />
     <Compile Include="Assets\Script\UIManager.cs" />
     <Compile Include="Assets\Script\UiManager1.cs" />

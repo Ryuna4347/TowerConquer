@@ -6,7 +6,6 @@ public class AttUnit : UnitBase {
 
     public int health_now;
     public float range_now;
-    public GameObject rangeImg; //하위에 있는 공격범위 오브젝트
     private bool hasStartEndRoad;
     private bool isMoving;
     public float movSpeed;
