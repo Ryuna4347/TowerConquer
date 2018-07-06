@@ -10,6 +10,7 @@ public class SearchRange : MonoBehaviour {
     {
         parentTag = gameObject.transform.parent.gameObject.tag;
     }
+    
 
     public void SetRange(float rangeRad)
     { //유닛에게서 전달받은 크기만큼 범위 정함
@@ -21,14 +22,14 @@ public class SearchRange : MonoBehaviour {
     {
         if (collision.gameObject.tag.Contains("Unit"))
         { //유닛이어야하며 동일 진영의 유닛은 취급하지 않는다.
-            gameObject.transform.parent.gameObject.GetComponent("UnitBase").AddTarget(collision.gameObject);
+            gameObject.transform.parent.gameObject.GetComponent<UnitBase>().AddTarget(collision.gameObject);
         }
     }
     private void OnCollisionExit2D(Collision2D collision)
     {
         if (collision.gameObject.tag.Contains("Unit"))
         { //유닛이어야하며 동일 진영의 유닛은 취급하지 않는다.
-            gameObject.transform.parent.gameObject.GetComponent("UnitBase").RemoveTarget(collision.gameObject);
+            gameObject.transform.parent.gameObject.GetComponent<UnitBase>().RemoveTarget(collision.gameObject);
         }
     }
 }

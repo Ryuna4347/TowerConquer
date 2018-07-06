@@ -266,7 +266,6 @@ public class UnitManager : MonoBehaviour {
                 Debug.Log("Loading Problem");
                 continue;
             }
-            Debug.Log(unit.name);
             unit.transform.localPosition = new Vector2(-1000, -1000);
             unit.name = unitName + "_" + unusedDefUnitList.Count;
             unusedDefUnitList.Add(unit);

@@ -27,6 +27,8 @@ public class MapRoadManager : MonoBehaviour
     private void Awake()
     {
         allMapRoad = new List<RoadDataFraction>();
+        startPoint = new List<string>();
+        endPoint = new List<string>();
     }
 
     public List<string> getStartPoint()
@@ -123,7 +125,7 @@ public class MapRoadManager : MonoBehaviour
 
                     foreach(string startVal in tempMapRoad.start)
                     {
-                        startPoint.Add(startVal);
+                        startPoint.Add(startVal); //여기가 문제??????
                     }
                     foreach (string endVal in tempMapRoad.end)
                     {
