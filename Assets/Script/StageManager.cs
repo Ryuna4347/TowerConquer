@@ -1,7 +1,15 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.IO;
 
+
+public class XmlStageInfo
+{//스테이지의 정보(레벨, 공수여부, 초기자금, 유닛정보)
+    public int lev;
+    public string stageMode; //공수모드
+    public string unitInfo;
+}
 public class XmlDefUnit
 {//xml파일을 읽어서 defunit에 넣기 전에 중간과정(유니티의 xml 파서가 기본형밖에 지원 안 해주기 때문)
     //스테이지별 모든 유닛의 정보가 담겨있다.
@@ -40,26 +48,77 @@ public class StageManager : MonoBehaviour {
     public UnitManager unitManager;
     public int lev;
     public bool isDefendMode;
-    public List<WaveInfo> waveInfo; //웨이브별 유닛들의 정보
-    public List<string> unitListForStage; //스테이지에서 사용할 공/수 포함 모든 유닛들(유저 수비기준 수비유닛은 별도의 xml파일에서 리스트 불러오기, 공격유닛은 스테이지 xml파일에 첨부되도록?)
+    private List<WaveInfo> waveInfo; //웨이브별 유닛들의 정보
+    private List<string> unitListForStage; //스테이지에서 사용할 공/수 포함 모든 유닛들(유저 수비기준 수비유닛은 별도의 xml파일에서 리스트 불러오기, 
+                                           //공격유닛은 스테이지 xml파일에 첨부되도록?)
+                                           //사용처 : 설치UI에서 사용되는 유닛만 가능표시할때, 설치시 이 리스트 안에 있는 유닛인지 검사할때
+    private int money; //현재 자금, 시작 로드시에는 초기 자금(스테이지 정보 얻을 때 같이 얻어와야 함)
+
+    public CameraControl cameraControl;
+
 
     // Use this for initialization
     void Awake()
     {
-        isDefendMode = true; //이건 나중에 attackMode추가하면 scene로딩할때 가져와야됨
+        cameraControl = GameObject.Find("Main Camera").GetComponent<CameraControl>();
 
         GameObject.Find("MapRoadManager").GetComponent<MapRoadManager>().LoadMapRoadData(1); //lev으로 변경해야됨
+        LoadStageData();
 
         //UI는 따로 불러오기(LoadScene하고 속성은 additive로)
         //ui는 기본 ui, pause ui, 승패ui 총 4개
         
-        if (isDefendMode)
-        {
-            unitManager.LoadAIAttUnitData(lev);
+    }
+
+    public List<WaveInfo> GetWaveInfo()
+    {
+        return waveInfo;
+    }
+    public List<string> GetUnitList()
+    {
+        return unitListForStage;
+    }
+    public int GetMoney()
+    {
+        return money;
+    }
+
+    private void LoadStageData()
+    {
+        string[] AIDataText = File.ReadAllText("Assets/SaveFolder/AIData_Att.txt").Split('\n');
+        int fileLen = AIDataText.Length;
+
+        if (fileLen < 1)
+        {  //저장된 정보가 있어야 불러옴
+            return;
         }
-        else
+        for (int i = 0; i < fileLen; i++)
         {
-            unitManager.LoadAIDefUnitData(lev); //컴퓨터 유닛 로드 실행(현재는 공격이 없으므로. 공격이 있으면 구별해서 실행시킬것)
+            if (AIDataText[i] == "")
+            { //빈칸이었을 경우 제외(2중엔터시 나올 수 있음)
+                continue;
+            }
+            XmlStageInfo tempStageInfo = JsonUtility.FromJson<XmlStageInfo>(AIDataText[i]);
+            if (tempStageInfo.lev == lev) //원하는 스테이지일 경우
+                isDefendMode = tempStageInfo.stageMode=="Def" ? true : false ; //공수여부 판단
+            
+                if (isDefendMode)
+                {
+                    unitManager.LoadAIAttUnitData(tempStageInfo.unitInfo);
+                }
+                else
+                {
+                    unitManager.LoadAIDefUnitData(tempStageInfo.unitInfo); //컴퓨터 유닛 로드 실행(현재는 공격이 없으므로. 공격이 있으면 구별해서 실행시킬것)
+            }
+            cameraControl.LoadMapImage(lev);
+        }
+    }
+
+    public void UseMoney(int cost)
+    {
+        if (money - cost < 0)
+        {
+
         }
     }
 }

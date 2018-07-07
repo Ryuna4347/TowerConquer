@@ -11,6 +11,8 @@ public class UnitBase : MonoBehaviour { //리스트의 경우 수비때 유닛 �
     public List<Sprite> unitImgList;
     public List<int> healthList;
     public List<float> searchRangeList;
+    public List<int> installCost; //설치비용 및 업그레이드 비용
+
     public GameObject targetUnit; //공격할 대상(공격대상 설정은 유닛 오브젝트 하위에 있는 범위 표시 오브젝트에서 설정하게)
     public List<GameObject> enemyInRange; //사정거리 내의 적유닛 리스트
     public GameObject rangeImg; //유닛 하위에 있는 공격범위 스프라이트 오브젝트
@@ -22,6 +24,7 @@ public class UnitBase : MonoBehaviour { //리스트의 경우 수비때 유닛 �
         healthList = new List<int>();
         searchRangeList = new List<float>();
         enemyInRange = new List<GameObject>();
+        installCost = new List<int>();
     }
 
     public void SetUnitPosition(Vector2 unitPos)
@@ -32,6 +35,12 @@ public class UnitBase : MonoBehaviour { //리스트의 경우 수비때 유닛 �
     {
 
     }
+
+    public int GetInstallCost()
+    {
+        return installCost[lev_now];
+    }
+
     public void SetTargetUnit(GameObject target)
     { //유닛의 공격목표 설정
         targetUnit = target;
