@@ -1,1 +1,3 @@
-{"unitName":["AttUnit1","AttUnit2","AttUnit2"],"lev":1,"numOfRoad":3,"unitRoadName":["Road_1","Road_2","Road_3","없음"]}
+{"lev":1,"stageMode":"Def","unitInfo":"{'unitName':['AttUnit1','AttUnit2','AttUnit2'],'numOfUnit':3,'totalWave':2,'unitRoadName':['Road_1','Road_2','Road_3','없음','Road_1','Road_2','Road_3','없음','Road_1','Road_2','Road_3','없음'],'unitStartPoint':[0,0,0],'unitWaveInfo':[0,1,1]}"}
+
+{"lev":2,"stageMode":"Att","unitInfo": ""}

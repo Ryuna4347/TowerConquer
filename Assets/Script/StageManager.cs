@@ -13,7 +13,6 @@ public class XmlStageInfo
 public class XmlDefUnit
 {//xml파일을 읽어서 defunit에 넣기 전에 중간과정(유니티의 xml 파서가 기본형밖에 지원 안 해주기 때문)
     //스테이지별 모든 유닛의 정보가 담겨있다.
-    public int lev;
     public int totalWave;
 
     public string[] unitName;
@@ -24,14 +23,13 @@ public class XmlDefUnit
 public class XmlAttUnit
 {//xml파일을 읽어서 defunit에 넣기 전에 중간과정(유니티의 xml 파서가 기본형밖에 지원 안 해주기 때문)
     //스테이지별 모든 유닛의 정보가 담겨있다.
-    public int lev;
     public int totalWave;
 
     public string[] unitName;
     public int numOfUnit;
     public string[] unitRoadName; //유닛이 지날 길의 이름들, "없음"으로 끊고 다음 유닛 길정보로 넘어감
     public string[] unitStartPoint; //유닛이 시작하는 곳의 위치(숫자로 구성되어있으며, 각 숫자는 길이 시작되는 곳들을 모은 리스트(MapRoadManager에 생성)에서의 번호를 나타낸다.)
-    public int[] unitWaveInfo;
+    public int[] unitWaveInfo; //유닛이 등장할 웨이브(0부터 시작)
 }
 public class WaveInfo
 { //웨이브 별 유닛상태(우선은 수비만, 나중에 공격추가하게되면 같이쓰던지(안쓰는 속성은 빈칸으로하고 공/수여부 따져서 조절) 아니면 그냥 따로 클래스를 만들던지)
@@ -39,6 +37,12 @@ public class WaveInfo
     public int wave; //웨이브 단계
     public List<GameObject> unitList;
     public List<Vector2> unitPosList;//순서는 유닛리스트와 동일
+
+    public WaveInfo()
+    {
+        unitList = new List<GameObject>();
+        unitPosList = new List<Vector2>();
+    }
 }
 
 public class StageManager : MonoBehaviour {
@@ -62,8 +66,13 @@ public class StageManager : MonoBehaviour {
     {
         cameraControl = GameObject.Find("Main Camera").GetComponent<CameraControl>();
 
+        waveInfo = new List<WaveInfo>();
+        unitListForStage = new List<string>();
+
         GameObject.Find("MapRoadManager").GetComponent<MapRoadManager>().LoadMapRoadData(1); //lev으로 변경해야됨
         LoadStageData();
+
+
 
         //UI는 따로 불러오기(LoadScene하고 속성은 additive로)
         //ui는 기본 ui, pause ui, 승패ui 총 4개
@@ -98,10 +107,13 @@ public class StageManager : MonoBehaviour {
             { //빈칸이었을 경우 제외(2중엔터시 나올 수 있음)
                 continue;
             }
+            Debug.Log(AIDataText[i]);
             XmlStageInfo tempStageInfo = JsonUtility.FromJson<XmlStageInfo>(AIDataText[i]);
-            if (tempStageInfo.lev == lev) //원하는 스테이지일 경우
-                isDefendMode = tempStageInfo.stageMode=="Def" ? true : false ; //공수여부 판단
-            
+            if (tempStageInfo.lev == lev)
+            { //원하는 스테이지일 경우
+                isDefendMode = tempStageInfo.stageMode == "Def" ? true : false; //공수여부 판단
+                
+
                 if (isDefendMode)
                 {
                     unitManager.LoadAIAttUnitData(tempStageInfo.unitInfo);
@@ -109,8 +121,10 @@ public class StageManager : MonoBehaviour {
                 else
                 {
                     unitManager.LoadAIDefUnitData(tempStageInfo.unitInfo); //컴퓨터 유닛 로드 실행(현재는 공격이 없으므로. 공격이 있으면 구별해서 실행시킬것)
+                }
+                cameraControl.LoadMapImage(lev);
+                return; //레벨을 찾았으므로 뒤는 안봐도 된다
             }
-            cameraControl.LoadMapImage(lev);
         }
     }
 

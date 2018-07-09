@@ -188,6 +188,7 @@ public class UnitManager : MonoBehaviour
     }
     public void LoadAIAttUnitData(string unitInfo)
     { //수비시 유닛정보(유닛명, 유닛 위치, 웨이브)를 얻어서 저장(따로 웨이브 정보를 담는 클래스 생성할 것)
+        unitInfo=unitInfo.Replace('\'', '"');
         XmlAttUnit tempAIAttUnit = JsonUtility.FromJson<XmlAttUnit>(unitInfo);
         LoadUnitResources(tempAIAttUnit.unitName); //불러온 유닛들 설치
 
@@ -196,6 +197,7 @@ public class UnitManager : MonoBehaviour
         {//모든 웨이브 정보가 들어갈 때까지 반복
             WaveInfo tempWaveInfo = new WaveInfo();
             tempWaveInfo.wave = k + 1;//0부터 시작이므로 1을 더해주고 웨이브 단계를 명시
+            Debug.Log(tempWaveInfo);
             int count = 0;
             int unitRoadLen = tempAIAttUnit.unitRoadName.Length;
 
@@ -205,7 +207,6 @@ public class UnitManager : MonoBehaviour
                 if (tempAIAttUnit.unitWaveInfo[j] == k)
                 {//유닛이 들어가야할 웨이브 순서와 현재 저장중인 웨이브가 맞는다면 진행
                     GameObject tempAttUnit = SearchNSelectUnit(tempAIAttUnit.unitName[j]);
-                    tempAttUnit.name += "_" + j; //이름 수정(유닛 구별 위함)
 
                     List<string> tempUnitPath = new List<string>(); //해당 유닛
 
