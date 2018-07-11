@@ -280,4 +280,8 @@ public class UnitManager : MonoBehaviour
         return cameraControl.GetWorldPosition(selectMousePos);
     }
 
+    public void ReadyForWave(WaveInfo waveInfo)
+    {
+
+    }
 }

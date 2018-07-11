@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using System.IO;
 
 
@@ -60,10 +61,15 @@ public class StageManager : MonoBehaviour {
 
     public CameraControl cameraControl;
 
+    private int wave_now;
+    private bool isGameStarting;
+
 
     // Use this for initialization
     void Awake()
     {
+        SceneManager.LoadScene("StageUI", LoadSceneMode.Additive);
+
         cameraControl = GameObject.Find("Main Camera").GetComponent<CameraControl>();
 
         waveInfo = new List<WaveInfo>();
@@ -73,10 +79,16 @@ public class StageManager : MonoBehaviour {
         LoadStageData();
 
 
+        wave_now = 1;
+        isGameStarting = false;
+    }
 
-        //UI는 따로 불러오기(LoadScene하고 속성은 additive로)
-        //ui는 기본 ui, pause ui, 승패ui 총 4개
-        
+    private void Start()
+    {
+        if (!isGameStarting)
+        {
+            WaveStart();
+        }
     }
 
     public List<WaveInfo> GetWaveInfo()
@@ -134,5 +146,15 @@ public class StageManager : MonoBehaviour {
         {
 
         }
+    }
+    public void WaveStart()
+    {
+        unitManager.ReadyForWave(waveInfo[wave_now]); //웨이브에 해당하는 유닛들 지정위치에
+        //5초 뒤 시작 안내
+        Invoke("StartWave", 5);
+    }
+    public void StartWave()
+    {
+        EventManager.TriggerEvent("WaveStart",gameObject,"");
     }
 }

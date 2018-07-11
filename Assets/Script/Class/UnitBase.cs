@@ -18,6 +18,8 @@ public class UnitBase : MonoBehaviour { //리스트의 경우 수비때 유닛 �
     public GameObject rangeImg; //유닛 하위에 있는 공격범위 스프라이트 오브젝트
     //public BulletInfo bullet;  유닛이 갖는 총알의 정의(수비의 경우 공격력, 공격의 경우 일부가 소지하며 특수능력 발동)
 
+    private bool isWaveStart;
+
     private void Awake()
     {
         unitImgList = new List<Sprite>();
@@ -25,6 +27,19 @@ public class UnitBase : MonoBehaviour { //리스트의 경우 수비때 유닛 �
         searchRangeList = new List<float>();
         enemyInRange = new List<GameObject>();
         installCost = new List<int>();
+
+
+        EventManager.StartListening("WaveStart", WaveStart);
+    }
+
+    private void OnDestroy()
+    {
+        EventManager.StopListening("WaveStart", WaveStart);
+    }
+
+    void OnEnable()
+    {
+        ResetUnit();
     }
 
     public void SetUnitPosition(Vector2 unitPos)
@@ -90,5 +105,9 @@ public class UnitBase : MonoBehaviour { //리스트의 경우 수비때 유닛 �
             }
         }
     }
-    
+
+    public void WaveStart(GameObject obj, string param)
+    {
+        isWaveStart = true;
+    }
 }
