@@ -36,11 +36,7 @@ public class UnitBase : MonoBehaviour { //리스트의 경우 수비때 유닛 �
     {
         EventManager.StopListening("WaveStart", WaveStart);
     }
-
-    void OnEnable()
-    {
-        ResetUnit();
-    }
+    
 
     public void SetUnitPosition(Vector2 unitPos)
     {
@@ -61,7 +57,7 @@ public class UnitBase : MonoBehaviour { //리스트의 경우 수비때 유닛 �
         targetUnit = target;
     }
 
-    private void OnEnable()
+    public virtual void OnEnable()
     {
         lev_now = 1;
         SetUnitRangeImage();

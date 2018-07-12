@@ -71,8 +71,10 @@ public class AttUnit : UnitBase {
     {
         unitPath.ConnectWithRoad(roadName);
     }
-    private void Enable()
+    public override void OnEnable()
     {
+        base.OnEnable();
+        ResetUnit();
         //여기
     }
     public void Move()

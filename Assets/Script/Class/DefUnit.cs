@@ -7,7 +7,13 @@ public class DefUnit : UnitBase {
     public float range_now;
     public List<int> powerList; //유닛 레벨별 공격력
     public int power_now;
-    
+
+
+    public override void OnEnable()
+    {
+        ResetUnit();
+        //여기
+    }
 
     public override void ResetUnit()
     {//오브젝트가 사라질 경우(유닛 제거 및 파괴) 1레벨 기준으로 능력치, 이미지를 되돌리기

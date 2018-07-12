@@ -161,6 +161,9 @@ public class UnitManager : MonoBehaviour
 
     public void LoadAIDefUnitData(string unitInfo)
     { //수비시 유닛정보(유닛명, 유닛 위치, 웨이브)를 얻어서 저장(따로 웨이브 정보를 담는 클래스 생성할 것)
+        int unitIndex = 0; //현재 저장할 유닛이 xml 리스트에서 어디있는지 위치를 나타냄
+
+
         XmlDefUnit tempAIDefUnit = JsonUtility.FromJson<XmlDefUnit>(unitInfo);
         LoadUnitResources(tempAIDefUnit.unitName); //불러온 유닛들 설치
 
@@ -175,19 +178,27 @@ public class UnitManager : MonoBehaviour
             { //스테이지에 적힌 모든 공격 유닛에 대한 정보를 저장
                 if (tempAIDefUnit.unitWaveInfo[j] == k)
                 {//유닛이 들어가야할 웨이브 순서와 현재 저장중인 웨이브가 맞는다면 진행
-                    GameObject tempDefUnit = SearchNSelectUnit(tempAIDefUnit.unitName[j]);
+                    GameObject tempDefUnit = SearchNSelectUnit(tempAIDefUnit.unitName[unitIndex]);
                     Vector2 tempDefUnitPos = new Vector2(tempAIDefUnit.unitPos[2 * j], tempAIDefUnit.unitPos[2 * j + 1]); //위 유닛의 위치
                     tempDefUnit.name += "_" + j; //이름 수정(유닛 구별 위함)
                                                  //웨이브 정보
-                    tempWaveInfo.unitList.Add(tempDefUnit); //유닛과 유닛의 좌표를 리스트에 추가
-                    tempWaveInfo.unitPosList.Add(tempDefUnitPos);
+
+
+                    Vector2 unitStartPos = new Vector2(tempAIDefUnit.unitPos[unitIndex],tempAIDefUnit.unitPos[unitIndex+1]);
+
+                    tempWaveInfo.GetUnitList().Add(tempDefUnit); //유닛과 유닛의 좌표를 리스트에 추가
+                    tempWaveInfo.AddUnitList(tempDefUnit); //유닛과 유닛의 좌표를 리스트에 추가
+                    tempWaveInfo.AddUnitPosition(tempDefUnit.name, unitStartPos);
                 }
             }
-            stageManager.GetWaveInfo().Add(tempWaveInfo); //작성완료된 웨이브 정보를 리스트에 추가
+            stageManager.GetWaveInfoList().Add(tempWaveInfo); //작성완료된 웨이브 정보를 리스트에 추가
         }
     }
     public void LoadAIAttUnitData(string unitInfo)
     { //수비시 유닛정보(유닛명, 유닛 위치, 웨이브)를 얻어서 저장(따로 웨이브 정보를 담는 클래스 생성할 것)
+        int unitIndex = 0; //현재 저장할 유닛이 xml 리스트에서 어디있는지 위치를 나타냄
+
+
         unitInfo=unitInfo.Replace('\'', '"');
         XmlAttUnit tempAIAttUnit = JsonUtility.FromJson<XmlAttUnit>(unitInfo);
         LoadUnitResources(tempAIAttUnit.unitName); //불러온 유닛들 설치
@@ -206,7 +217,7 @@ public class UnitManager : MonoBehaviour
             { //스테이지에 적힌 모든 수비 유닛에 대한 정보를 저장
                 if (tempAIAttUnit.unitWaveInfo[j] == k)
                 {//유닛이 들어가야할 웨이브 순서와 현재 저장중인 웨이브가 맞는다면 진행
-                    GameObject tempAttUnit = SearchNSelectUnit(tempAIAttUnit.unitName[j]);
+                    GameObject tempAttUnit = SearchNSelectUnit(tempAIAttUnit.unitName[unitIndex]);
 
                     List<string> tempUnitPath = new List<string>(); //해당 유닛
 
@@ -217,11 +228,14 @@ public class UnitManager : MonoBehaviour
                     }
                     count++; //지금 위치가 "없음"위치일것이기 때문에 1 더 늘려야 다음 유닛때 길 추가가 가능하다.
 
+                    Vector2 unitStartPos = new Vector2(float.Parse(tempAIAttUnit.unitStartPoint[unitIndex * 2]), float.Parse(tempAIAttUnit.unitStartPoint[unitIndex * 2 + 1]));
+
                     tempAttUnit.GetComponent<AttUnit>().SetPath(tempUnitPath);
-                    tempWaveInfo.unitList.Add(tempAttUnit); //유닛과 유닛의 좌표를 리스트에 추가
+                    tempWaveInfo.AddUnitList(tempAttUnit); //유닛과 유닛의 좌표를 리스트에 추가
+                    tempWaveInfo.AddUnitPosition(tempAttUnit.name, unitStartPos);
                 }
             }
-            stageManager.GetWaveInfo().Add(tempWaveInfo); //작성완료된 웨이브 정보를 리스트에 추가
+            stageManager.GetWaveInfoList().Add(tempWaveInfo); //작성완료된 웨이브 정보를 리스트에 추가
         }
     }
 
@@ -282,6 +296,12 @@ public class UnitManager : MonoBehaviour
 
     public void ReadyForWave(WaveInfo waveInfo)
     {
-
+        List<string> unitList = waveInfo.GetUnitList();
+        Dictionary<string, Vector2> unitPosList = waveInfo.GetUnitPosList();
+        foreach (string unitName in unitList)
+        {
+            GameObject unitObj = SearchNSelectUnit(unitName);
+            unitObj.transform.position = unitPosList[unitName];
+        }
     }
 }

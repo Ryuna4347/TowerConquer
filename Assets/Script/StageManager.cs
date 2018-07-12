@@ -18,7 +18,7 @@ public class XmlDefUnit
 
     public string[] unitName;
     public int numOfUnit;
-    public int[] unitPos;
+    public float[] unitPos;
     public int[] unitWaveInfo;
 }
 public class XmlAttUnit
@@ -36,13 +36,28 @@ public class WaveInfo
 { //웨이브 별 유닛상태(우선은 수비만, 나중에 공격추가하게되면 같이쓰던지(안쓰는 속성은 빈칸으로하고 공/수여부 따져서 조절) 아니면 그냥 따로 클래스를 만들던지)
     //StageManager로 옮기는게 좋을거같고 StageManager는 이 클래스를 리스트로 가지고 있을 예정이다.
     public int wave; //웨이브 단계
-    public List<GameObject> unitList;
-    public List<Vector2> unitPosList;//순서는 유닛리스트와 동일
+    private List<string> unitList;
+    private Dictionary<string, Vector2> unitPosList;//공격유닛의 경우 시작점, 수비유닛의 경우 설치점
 
     public WaveInfo()
     {
-        unitList = new List<GameObject>();
-        unitPosList = new List<Vector2>();
+        unitList = new List<string>();
+    }
+    public List<string> GetUnitList()
+    {
+        return unitList;
+    }
+    public Dictionary<string, Vector2> GetUnitPosList()
+    {
+        return unitPosList;
+    }
+    public void AddUnitList(GameObject obj)
+    {
+        unitList.Add(obj.name);
+    }
+    public void AddUnitPosition(string objName, Vector2 unitStartPos)
+    {
+        unitPosList.Add(objName, unitStartPos);
     }
 }
 
@@ -91,7 +106,13 @@ public class StageManager : MonoBehaviour {
         }
     }
 
-    public List<WaveInfo> GetWaveInfo()
+    //현재 웨이브의 정보를 반환
+    public WaveInfo GetWaveInfo()
+    {
+        return waveInfo[wave_now];
+    }
+    //전체 웨이브의 정보를 반환
+    public List<WaveInfo> GetWaveInfoList()
     {
         return waveInfo;
     }
@@ -119,7 +140,6 @@ public class StageManager : MonoBehaviour {
             { //빈칸이었을 경우 제외(2중엔터시 나올 수 있음)
                 continue;
             }
-            Debug.Log(AIDataText[i]);
             XmlStageInfo tempStageInfo = JsonUtility.FromJson<XmlStageInfo>(AIDataText[i]);
             if (tempStageInfo.lev == lev)
             { //원하는 스테이지일 경우
@@ -144,7 +164,7 @@ public class StageManager : MonoBehaviour {
     {
         if (money - cost < 0)
         {
-
+            money -= cost;
         }
     }
     public void WaveStart()
